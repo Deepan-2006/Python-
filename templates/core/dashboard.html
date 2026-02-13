@@ -1,0 +1,393 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="welcome-header">
+        <div class="user-greeting">
+            <h1>Welcome back, <span>{{ user.username }}</span>! 👋</h1>
+            <p>Ready to level up your knowledge today?</p>
+        </div>
+        <div class="quick-stats">
+            <div class="stat-pill">
+                <i class="fas fa-star"></i>
+                <span>{{ user.profile.points }} XP</span>
+            </div>
+            <div class="stat-pill">
+                <i class="fas fa-fire"></i>
+                <span>{{ user.profile.streak }} Day Streak</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Main Stats Card -->
+        <div class="dash-card main-stats">
+            <h3>Recent Performance</h3>
+            {% if recent_results %}
+            <div class="performance-chart">
+                <div class="chart-bars">
+                    {% for result in recent_results %}
+                    <div class="bar-item" style="height: {{ result.score }}%"
+                        title="{{ result.subcategory.name_en }}: {{ result.score }}%">
+                        <span class="bar-label">{{ result.completed_at|date:"M d" }}</span>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-chart-line"></i>
+                <p>No quiz results yet. Start your first quiz!</p>
+                <a href="{% url 'category_list' %}" class="btn btn-primary btn-sm">Browse Categories</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- AI Weak Areas Card -->
+        <div class="dash-card ai-insights">
+            <div class="card-header">
+                <i class="fas fa-robot"></i>
+                <h3>AI Smart Learning</h3>
+            </div>
+            {% if weak_categories %}
+            <p class="insight-text">Focus on these to boost your score:</p>
+            <div class="recommendations">
+                {% for sub in weak_categories %}
+                <div class="rec-item">
+                    <div class="rec-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="rec-info">
+                        <h4>{{ sub.name_en }}</h4>
+                        <a href="{% url 'quiz_config' sub.id %}" class="btn-text">Improve Now <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="insight-text">You're doing great! Why not try a harder difficulty?</p>
+            {% endif %}
+        </div>
+
+        <!-- Ongoing Quizzes -->
+        <div class="dash-card">
+            <div class="card-header">
+                <i class="fas fa-spinner"></i>
+                <h3>Ongoing Quizzes</h3>
+            </div>
+            <div class="recommendations">
+                {% for session in incomplete_quizzes %}
+                <div class="rec-item">
+                    <div class="rec-icon bg-warning"><i class="fas fa-play"></i></div>
+                    <div class="rec-info">
+                        <h4>{{ session.subcategory.name_en }}</h4>
+                        <p class="text-xs">{{ session.difficulty|title }} | Started {{ session.started_at|timesince }}
+                            ago</p>
+                        <a href="{% url 'resume_quiz' session.id %}" class="btn-text">Resume Quiz <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">No incomplete quizzes. You're all caught up!</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Leaderboard Snippet -->
+        <div class="dash-card">
+            <div class="card-header">
+                <i class="fas fa-trophy"></i>
+                <h3>Top Performers</h3>
+            </div>
+            <div class="rankings-list">
+                {% for rank_user in rankings %}
+                <div class="rank-item {% if rank_user == user %}current-user{% endif %}">
+                    <span class="rank-num">#{{ forloop.counter }}</span>
+                    <span class="rank-name">{{ rank_user.username }}</span>
+                    <span class="rank-points">{{ rank_user.profile.points }} XP</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Quiz History Table -->
+        <div class="dash-card history-card">
+            <h3>Full Quiz History</h3>
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Topic</th>
+                            <th>Difficulty</th>
+                            <th>Score</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                        <tr>
+                            <td>{{ result.subcategory.name_en }}</td>
+                            <td><span class="badge">{{ result.difficulty|title }}</span></td>
+                            <td><span
+                                    class="score-badge {% if result.score >= 80 %}high{% elif result.score >= 50 %}medium{% else %}low{% endif %}">{{
+                                    result.score }}%</span></td>
+                            <td>{{ result.completed_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'quiz_result' result.id %}" class="btn-icon" title="View Result"><i
+                                        class="fas fa-chart-pie"></i></a>
+                                <a href="{% url 'review_quiz' result.id %}" class="btn-icon ml-2"
+                                    title="Review Answers"><i class="fas fa-list-check"></i></a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No history available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(var(--primary-h), var(--primary-s), 50%, 0.1), transparent);
+        border-radius: var(--radius-lg);
+    }
+
+    .user-greeting h1 span {
+        color: var(--primary);
+    }
+
+    .quick-stats {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .stat-pill {
+        background: var(--bg-card);
+        padding: 0.8rem 1.5rem;
+        border-radius: 50px;
+        border: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    .dash-card {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+    }
+
+    .history-card {
+        grid-column: span 2;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+    }
+
+    .performance-chart {
+        height: 200px;
+        display: flex;
+        align-items: flex-end;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .chart-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 2rem;
+        height: 100%;
+        width: 100%;
+        padding: 0 1rem;
+    }
+
+    .bar-item {
+        flex: 1;
+        background: linear-gradient(to top, var(--primary), var(--accent));
+        border-radius: 6px 6px 0 0;
+        position: relative;
+        min-width: 40px;
+        max-width: 60px;
+        transition: var(--transition);
+    }
+
+    .bar-item:hover {
+        transform: scaleX(1.1);
+        filter: brightness(1.2);
+    }
+
+    .bar-label {
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    .insight-text {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .rec-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--glass);
+        border-radius: var(--radius-md);
+        margin-bottom: 1rem;
+        border: 1px solid var(--glass-border);
+    }
+
+    .rec-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--primary);
+        color: white;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-text {
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .history-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 1.2rem;
+        text-align: left;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .score-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .score-badge.high {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .score-badge.medium {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .score-badge.low {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .rankings-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .rank-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem 1.2rem;
+        background: var(--glass);
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+    }
+
+    .rank-item.current-user {
+        border-color: var(--primary);
+        background: rgba(var(--primary-h), var(--primary-s), 50%, 0.1);
+    }
+
+    .rank-num {
+        font-weight: 800;
+        color: var(--primary);
+        width: 30px;
+    }
+
+    .rank-name {
+        flex: 1;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    .rank-points {
+        font-size: 0.85rem;
+        font-weight: 700;
+        opacity: 0.8;
+    }
+
+    .bg-warning {
+        background: #f59e0b !important;
+    }
+
+    .text-xs {
+        font-size: 0.75rem;
+    }
+
+
+    @media (max-width: 900px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .history-card {
+            grid-column: span 1;
+        }
+    }
+</style>
+{% endblock %}

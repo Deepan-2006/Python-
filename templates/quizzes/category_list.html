@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quiz Categories | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="section-header mb-5">
+        <h1>Explore <span>Categories</span></h1>
+        <p class="text-muted">Choose a category to find specialized topics prepared for you.</p>
+    </div>
+
+    <div class="card-grid">
+        {% for category in categories %}
+        <div class="card category-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+            <div class="category-img">
+                {% if category.icon %}
+                <img src="{{ category.icon.url }}" alt="{{ category.name_en }}">
+                {% else %}
+                <div class="placeholder-icon"><i class="fas fa-book"></i></div>
+                {% endif %}
+            </div>
+            <h3>{{ category.name_en }}</h3>
+            <p>{{ category.description|truncatewords:15 }}</p>
+            <div class="category-meta mb-4">
+                <span class="badge"><i class="fas fa-layer-group"></i> {{ category.subcategories.count }} Topics</span>
+            </div>
+            <a href="{% url 'subcategory_list' category.id %}" class="btn btn-primary w-100">Browse Topics</a>
+        </div>
+        {% empty %}
+        <div class="card empty-card text-center">
+            <p>No categories available yet. Please check back later.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .category-card {
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        padding: 2.5rem;
+    }
+
+    .category-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .category-img {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 2rem;
+        background: var(--glass);
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+    }
+
+    .badge {
+        background: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}

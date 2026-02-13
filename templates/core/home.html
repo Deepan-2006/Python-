@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome to Quiz Pro | Elevate Your Learning{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Master Any Subject with <br><span>AI-Powered</span> Learning</h1>
+    <p>Personalized quizzes, deep performance insights, and real-time competition. Join the next generation of online
+        learning.</p>
+    <div class="hero-btns">
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Get Started Free <i
+                class="fas fa-arrow-right"></i></a>
+        <a href="{% url 'category_list' %}" class="btn btn-outline btn-lg">Browse Categories</a>
+    </div>
+</section>
+
+<section class="features">
+    <h2 class="section-title">Why Choose <span>Quiz Pro</span>?</h2>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-robot"></i></div>
+            <h3>AI Smart Learning</h3>
+            <p>Weak area detection and personalized question recommendations to help you improve faster.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Advanced Analytics</h3>
+            <p>Track your score trends, monthly progress, and rank against other users globally.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><i class="fas fa-trophy"></i></div>
+            <h3>Gamification</h3>
+            <p>Earn badges, maintain paths, and collect rewards as you reach new expertise levels.</p>
+        </div>
+    </div>
+</section>
+
+<section class="categories-section">
+    <div class="section-header">
+        <h2>Popular <span>Categories</span></h2>
+        <a href="{% url 'category_list' %}" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+    </div>
+
+    <div class="card-grid">
+        {% for category in categories %}
+        <div class="card category-card">
+            <div class="category-img">
+                {% if category.icon %}
+                <img src="{{ category.icon.url }}" alt="{{ category.name_en }}">
+                {% else %}
+                <div class="placeholder-icon"><i class="fas fa-book"></i></div>
+                {% endif %}
+            </div>
+            <h3>{{ category.name_en }}</h3>
+            <p>{{ category.description|truncatewords:15 }}</p>
+            <a href="{% url 'subcategory_list' category.id %}" class="btn btn-outline btn-sm">Start Quiz</a>
+        </div>
+
+        {% empty %}
+        <div class="card empty-card">
+            <p>No categories available yet. Admin is adding more questions!</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<style>
+    .hero-btns {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+    }
+
+    .btn-lg {
+        padding: 1.2rem 2.5rem;
+        font-size: 1.1rem;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin: 4rem 0 2rem;
+    }
+
+    .section-title span {
+        color: var(--primary);
+    }
+
+    .card-icon {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 5rem 0 2rem;
+    }
+
+    .category-card {
+        text-align: center;
+    }
+
+    .category-img {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: var(--glass);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .placeholder-icon {
+        font-size: 2rem;
+        color: var(--primary);
+    }
+</style>
+{% endblock %}

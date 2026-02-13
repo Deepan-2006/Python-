@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Welcome <span>Back</span></h2>
+            <p>Login to continue your learning journey</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" id="id_username" placeholder="Enter your username" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password">Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" id="id_password" placeholder="••••••••" required>
+                </div>
+                <div class="form-footer">
+                    <a href="#" class="forgot-link">Forgot Password?</a>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Log In <i class="fas fa-sign-in-alt"></i></button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{% url 'register' %}">Sign Up</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+    }
+
+    .auth-card {
+        background: var(--bg-card);
+        padding: 3rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-lg);
+        width: 100%;
+        max-width: 450px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .auth-header h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-header span {
+        color: var(--primary);
+    }
+
+    .auth-header p {
+        color: var(--text-muted);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.6rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 0.8rem 1rem 0.8rem 2.8rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-md);
+        color: var(--text-main);
+        transition: var(--transition);
+        font-size: 1rem;
+    }
+
+    .input-wrapper input:focus {
+        border-color: var(--primary);
+        outline: none;
+        background: var(--bg-card-hover);
+        box-shadow: 0 0 0 4px rgba(var(--primary-h), var(--primary-s), 50%, 0.1);
+    }
+
+    .form-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+    }
+
+    .forgot-link {
+        font-size: 0.85rem;
+        color: var(--primary);
+    }
+
+    .btn-block {
+        width: 100%;
+        justify-content: center;
+        margin-top: 1rem;
+        padding: 1rem;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+    }
+
+    .auth-footer a {
+        color: var(--primary);
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Up | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Join <span>Quiz Pro</span></h2>
+            <p>Create an account to start your learning journey</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="input-wrapper">
+                    {% if 'username' in field.name %}<i class="fas fa-user"></i>
+                    {% elif 'email' in field.name %}<i class="fas fa-envelope"></i>
+                    {% elif 'password' in field.name %}<i class="fas fa-lock"></i>
+                    {% else %}<i class="fas fa-edit"></i>{% endif %}
+                    <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}"
+                        id="{{ field.id_for_label }}" placeholder="Enter {{ field.label }}" required>
+                </div>
+                {% if field.errors %}
+                <div class="field-error">{{ field.errors|first }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary btn-block">Create Account <i
+                    class="fas fa-user-plus"></i></button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Log In</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+        padding: 2rem 0;
+    }
+
+    .auth-card {
+        background: var(--bg-card);
+        padding: 3rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-lg);
+        width: 100%;
+        max-width: 480px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .auth-header h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-header span {
+        color: var(--primary);
+    }
+
+    .auth-header p {
+        color: var(--text-muted);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.6rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 0.8rem 1rem 0.8rem 2.8rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-md);
+        color: var(--text-main);
+        transition: var(--transition);
+        font-size: 1rem;
+    }
+
+    .input-wrapper input:focus {
+        border-color: var(--primary);
+        outline: none;
+        background: var(--bg-card-hover);
+        box-shadow: 0 0 0 4px rgba(var(--primary-h), var(--primary-s), 50%, 0.1);
+    }
+
+    .field-error {
+        color: #ef4444;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+    }
+
+    .btn-block {
+        width: 100%;
+        justify-content: center;
+        margin-top: 1rem;
+        padding: 1rem;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+    }
+
+    .auth-footer a {
+        color: var(--primary);
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

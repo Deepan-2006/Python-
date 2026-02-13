@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Control Panel | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="header-section">
+        <h1>Admin Control <span>Panel</span></h1>
+        <p>Manage users, content, and platform performance.</p>
+    </div>
+
+    <!-- Quick Stats Benchmarks -->
+    <div class="benchmark-grid">
+        <div class="bench-card">
+            <span class="label">Total Users</span>
+            <span class="value">{{ total_users }}</span>
+        </div>
+        <div class="bench-card">
+            <span class="label">Total Quizzes</span>
+            <span class="value">{{ total_quizzes }}</span>
+        </div>
+        <div class="bench-card">
+            <span class="label">Avg. Score</span>
+            <span class="value">{{ avg_score|floatformat:1 }}%</span>
+        </div>
+    </div>
+
+    <div class="admin-grid">
+        <!-- Analytics Section -->
+        <div class="admin-card stats-main">
+            <h3>Popular Categories</h3>
+            <div class="category-stats">
+                {% for cat in most_attempted %}
+                <div class="stat-row">
+                    <span class="cat-name">{{ cat.name_en }}</span>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: {{ cat.attempts|add:5 }}%;"></div>
+                    </div>
+                    <span class="cat-value">{{ cat.attempts }} attempts</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- User Performance Section -->
+        <div class="admin-card users-main">
+            <h3>User Performance Tracking</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Quizzes</th>
+                            <th>Avg Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users_performance %}
+                        <tr>
+                            <td>{{ u.username }}</td>
+                            <td>{{ u.total_quizzes }}</td>
+                            <td>{{ u.avg_user_score|default:0|floatformat:1 }}%</td>
+                            <td>
+                                {% if u.is_locked %}
+                                <span class="status-pill locked">Locked</span>
+                                {% else %}
+                                <span class="status-pill active">Active</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h3>Quick Content Management</h3>
+        <div class="action-btns">
+            <a href="/admin/quizzes/category/add/" class="btn btn-primary"><i class="fas fa-plus"></i> Add Category</a>
+            <a href="/admin/quizzes/question/add/" class="btn btn-outline"><i class="fas fa-plus"></i> Add Question</a>
+            <a href="/admin/users/user/" class="btn btn-outline"><i class="fas fa-users"></i> Manage Users</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-bottom: 5rem;
+    }
+
+    .header-section {
+        margin-bottom: 3rem;
+    }
+
+    .benchmark-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .bench-card {
+        background: var(--bg-card);
+        padding: 2rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--glass-border);
+        text-align: center;
+    }
+
+    .bench-card .label {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .bench-card .value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary);
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .admin-card {
+        background: var(--bg-card);
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--glass-border);
+    }
+
+    .stat-row {
+        margin-bottom: 1.5rem;
+    }
+
+    .cat-name {
+        display: block;
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+    }
+
+    .progress-track {
+        height: 10px;
+        background: var(--glass);
+        border-radius: 5px;
+        margin-bottom: 0.4rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(to right, var(--primary), var(--accent));
+        border-radius: 5px;
+    }
+
+    .cat-value {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+    }
+
+    th,
+    td {
+        padding: 1.2rem;
+        text-align: left;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .status-pill {
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .status-pill.active {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .status-pill.locked {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .quick-actions {
+        background: var(--glass);
+        padding: 3rem;
+        border-radius: var(--radius-lg);
+        text-align: center;
+        border: 1px solid var(--glass-border);
+    }
+
+    .action-btns {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quiz Pro | Intelligent Learning{% endblock %}</title>
+    <meta name="description" content="Advanced AI-powered quiz platform for smart learning.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Font Awesome (for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <a href="{% url 'home' %}" class="logo">
+                    <span class="logo-icon"><i class="fas fa-brain"></i></span>
+                    <span class="logo-text">Quiz<span>Pro</span></span>
+                </a>
+
+                <div class="nav-links">
+                    <a href="{% url 'home' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+                    <a href="{% url 'category_list' %}" class="nav-link">Categories</a>
+                    <a href="{% url 'leaderboard' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}">Leaderboard</a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'achievements' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'achievements' %}active{% endif %}">Achievements</a>
+                    <a href="{% url 'dashboard' %}"
+                        class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+                    {% if user.is_staff %}
+                    <a href="{% url 'admin_dashboard' %}" class="nav-link"><i class="fas fa-lock"></i> Admin Panel</a>
+                    {% endif %}
+                    <div class="user-menu">
+                        <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}"
+                            alt="Profile" class="nav-avatar">
+                        <div class="dropdown">
+                            <a href="{% url 'profile' %}">Profile</a>
+                            <a href="{% url 'achievements' %}">Badges</a>
+                            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="logout-btn">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary">Sign Up</a>
+                    {% endif %}
+                </div>
+
+                <button class="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content-wrapper">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2026 Quiz Pro. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Theme Switcher -->
+    <div class="theme-switcher">
+        <button id="theme-toggle" title="Toggle Light/Dark Mode">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

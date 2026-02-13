@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Review Quiz | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="review-container">
+    <div class="review-header">
+        <a href="{% url 'quiz_result' result.id %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to
+            Result</a>
+        <h1>Review: <span>{{ result.subcategory.name_en }}</span></h1>
+        <p>Analyze your performance with {{ result.difficulty|title }} level AI-powered explanations.</p>
+
+    </div>
+
+    <div class="questions-list">
+        {% for q in questions %}
+        <div class="review-card">
+            <div class="question-meta">
+                <span class="q-number">Question {{ forloop.counter }}</span>
+                <span class="difficulty-tag {{ q.difficulty }}">{{ q.difficulty|upper }}</span>
+            </div>
+            <h3>{{ q.text_en }}</h3>
+            <p class="ta-text">{{ q.text_ta }}</p>
+
+            <div class="choices-stack">
+                {% for choice in q.choices.all %}
+                <div class="choice-item {% if choice.is_correct %}correct{% endif %}">
+                    <span class="indicator">
+                        {% if choice.is_correct %}<i class="fas fa-check"></i>
+                        {% else %}<i class="fas fa-circle"></i>{% endif %}
+                    </span>
+                    <span class="choice-text">{{ choice.text_en }}</span>
+                    {% if choice.is_correct %}<span class="correct-label">Correct Answer</span>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="ai-explanation">
+                <div class="ai-header">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Insight</span>
+                </div>
+                <p>{{ q.explanation }}</p>
+                {% if q.ai_explanation %}
+                <p class="manual-explanation"><strong>Key Fact:</strong> {{ q.ai_explanation }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="review-footer">
+        <a href="{% url 'home' %}" class="btn btn-primary">Return Home</a>
+    </div>
+</div>
+
+<style>
+    .review-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding-bottom: 5rem;
+    }
+
+    .review-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .back-link {
+        color: var(--primary);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .review-card {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .question-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+    .q-number {
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .difficulty-tag {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-weight: 700;
+    }
+
+    .difficulty-tag.easy {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .difficulty-tag.medium {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .difficulty-tag.hard {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .choices-stack {
+        margin: 2rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .choice-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+    }
+
+    .choice-item.correct {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .indicator {
+        color: var(--text-muted);
+    }
+
+    .correct .indicator {
+        color: #10b981;
+    }
+
+    .correct-label {
+        margin-left: auto;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #10b981;
+        text-transform: uppercase;
+    }
+
+    .ai-explanation {
+        background: rgba(var(--primary-h), var(--primary-s), 50%, 0.05);
+        border-left: 4px solid var(--primary);
+        padding: 1.5rem;
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .ai-header {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: var(--primary);
+        font-weight: 700;
+        margin-bottom: 0.8rem;
+    }
+
+    .manual-explanation {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        border-top: 1px solid var(--glass-border);
+        padding-top: 1rem;
+    }
+</style>
+{% endblock %}

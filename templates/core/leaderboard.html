@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Leaderboard | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="leaderboard-container">
+    <div class="leaderboard-header">
+        <h1>Global <span>Rankings</span></h1>
+        <p>See how you compare with the best learners worldwide.</p>
+    </div>
+
+    <div class="top-three">
+        {% if top_users %}
+        {% for u in top_users %}
+        {% if forloop.counter <= 3 %} <div class="rank-card rank-{{ forloop.counter }}"
+            style="order: {% if forloop.counter == 1 %}2{% elif forloop.counter == 2 %}1{% else %}3{% endif %};">
+            <div class="rank-badge">{{ forloop.counter }}</div>
+            <div class="avatar-container" style="border-color: {{ u.profile.rank_color }}">
+                <img src="{% if u.profile.avatar %}{{ u.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}"
+                    alt="{{ u.username }}">
+            </div>
+            <h3>{{ u.username }}</h3>
+            <span class="badge" style="background: {{ u.profile.rank_color }}44; color: {{ u.profile.rank_color }}">
+                {{ u.profile.get_rank }}
+            </span>
+            <p class="points">{{ u.profile.points }} XP</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    <div class="no-data-msg">
+        <i class="fas fa-users-slash"></i>
+        <p>No rankings yet. Be the first to take a quiz!</p>
+        <a href="{% url 'category_list' %}" class="btn btn-primary mt-3">Start Now</a>
+    </div>
+    {% endif %}
+</div>
+
+{% if user.is_authenticated and user_rank %}
+<div class="user-standing mb-4">
+    <div class="standing-card">
+        <span class="rank-label">Your Current Standing</span>
+        <div class="standing-info">
+            <h3>#{{ user_rank }}</h3>
+            <div class="user-stats">
+                <p>{{ user.username }}</p>
+                <span class="badge"
+                    style="background: {{ user.profile.rank_color }}44; color: {{ user.profile.rank_color }}">{{
+                    user.profile.get_rank }}</span>
+            </div>
+            <div class="xp-info">{{ user.profile.points }} Total XP</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="leaderboard-list">
+    {% if top_users %}
+    <table class="rank-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Level</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in top_users %}
+            <tr {% if u == request.user %}class="current-user" {% endif %}>
+                <td>#{{ forloop.counter }}</td>
+                <td class="user-cell">
+                    <img src="{% if u.profile.avatar %}{{ u.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}"
+                        alt="">
+                    <span>{{ u.username }}</span>
+                </td>
+                <td><span class="rank-text" style="color: {{ u.profile.rank_color }}">{{ u.profile.get_rank }}</span>
+                </td>
+                <td><strong>{{ u.profile.points }}</strong> XP</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+</div>
+
+<style>
+    .leaderboard-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 5rem;
+    }
+
+    .leaderboard-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .top-three {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 2rem;
+        margin-bottom: 5rem;
+    }
+
+    .rank-card {
+        background: var(--bg-card);
+        border: 2px solid var(--glass-border);
+        padding: 2.5rem 1.5rem;
+        border-radius: var(--radius-lg);
+        text-align: center;
+        width: 240px;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .rank-1 {
+        transform: scale(1.1) translateY(-20px);
+        border-color: #f1c40f;
+        /* Gold */
+        z-index: 2;
+        background: linear-gradient(to bottom, var(--bg-card), rgba(241, 196, 15, 0.1));
+    }
+
+    .rank-2 {
+        border-color: #bdc3c7;
+        /* Silver */
+        transform: translateY(0px);
+    }
+
+    .rank-3 {
+        border-color: #cd7f32;
+        /* Bronze */
+        transform: translateY(10px);
+    }
+
+    .avatar-container {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        border: 4px solid;
+        padding: 5px;
+        position: relative;
+    }
+
+    .avatar-container img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .points {
+        font-weight: 800;
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+        color: var(--primary);
+    }
+
+    /* Standing Card */
+    .standing-card {
+        background: linear-gradient(90deg, var(--bg-card), rgba(var(--primary-h), var(--primary-s), 50%, 0.1));
+        border: 1px solid var(--primary);
+        padding: 1.5rem 2rem;
+        border-radius: var(--radius-lg);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        box-shadow: 0 0 20px rgba(var(--primary-h), var(--primary-s), 50%, 0.2);
+    }
+
+    .standing-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .standing-info h3 {
+        font-size: 3rem;
+        margin: 0;
+        font-weight: 900;
+        background: linear-gradient(to right, var(--primary), #fff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .user-stats {
+        text-align: center;
+    }
+
+    .xp-info {
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .no-data-msg {
+        text-align: center;
+        padding: 4rem;
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        width: 100%;
+    }
+
+    .no-data-msg i {
+        font-size: 4rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+
+    .rank-table tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Profile | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card profile-card glass-panel text-center p-4 h-100">
+                <div class="avatar-container mb-3 mx-auto">
+                    {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="profile-avatar-lg">
+                    {% else %}
+                    <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+                    {% endif %}
+                </div>
+                <h2 class="mb-0">{{ user.username }}</h2>
+                <p class="text-muted">{{ user.email }}</p>
+                <div class="profile-stats mt-4">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ user.profile.points }}</span>
+                        <span class="stat-label">Points</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ user.profile.rank }}</span>
+                        <span class="stat-label">Rank</span>
+                    </div>
+                </div>
+                <hr class="my-4">
+                <div class="bio-section">
+                    <p>{{ user.profile.bio|default:"No bio added yet." }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card glass-panel p-4">
+                <h3 class="mb-4">Update <span>Profile</span></h3>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">First Name</label>
+                            {{ u_form.first_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Last Name</label>
+                            {{ u_form.last_name }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        {{ u_form.email }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Profile Bio</label>
+                        {{ p_form.bio }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Language Preference</label>
+                            {{ p_form.language_preference }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Profile Picture</label>
+                            {{ p_form.avatar }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3 px-5 py-2">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-avatar-lg {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--primary);
+    }
+
+    .avatar-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: var(--glass);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: var(--primary);
+        border: 4px solid var(--glass-border);
+    }
+
+    .profile-stats {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    form input,
+    form textarea,
+    form select {
+        width: 100%;
+        padding: 0.8rem;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        margin-top: 0.5rem;
+    }
+
+    form input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

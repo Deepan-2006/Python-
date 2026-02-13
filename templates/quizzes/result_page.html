@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quiz Results | Quiz Pro{% endblock %}
+
+{% block content %}
+<!-- Confetti Canvas -->
+<canvas id="confetti-canvas"
+    style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<div class="result-container">
+
+    <div class="result-card">
+        <div class="result-header">
+            <div class="score-circle">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="circle" stroke-dasharray="{{ result.score }}, 100"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <text x="18" y="20.35" class="percentage">{{ result.score }}%</text>
+                </svg>
+            </div>
+            <h2>{% if result.score >= 75 %}Excellent Work!{% elif result.score >= 50 %}Good Job!{% else %}Keep
+                Practicing!{% endif %}</h2>
+            <p>You completed the <span>{{ result.subcategory.name_en }}</span> quiz ({{ result.difficulty|title }}).</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="stat-label">Correct</span>
+                <span class="stat-value">{{ result.correct_answers }} / {{ result.total_questions }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Time Spent</span>
+                <span class="stat-value">{{ result.duration_seconds }}s</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Points</span>
+                <span class="stat-value">+{{ result.score }} XP</span>
+            </div>
+        </div>
+
+        <div class="ai-summary-card">
+            <div class="ai-header">
+                <i class="fas fa-robot"></i>
+                <h3>AI Performance Analysis</h3>
+            </div>
+            <p>{{ result.ai_summary }}</p>
+
+            {% if result.ai_recommendations %}
+            <div class="ai-recommendation mt-3">
+                <p><strong><i class="fas fa-lightbulb"></i> AI Recommendation:</strong> {{ result.ai_recommendations }}
+                </p>
+            </div>
+            {% endif %}
+
+            <div class="ai-actions">
+                <a href="{% url 'review_quiz' result.id %}" class="btn btn-outline btn-sm"><i class="fas fa-search"></i>
+                    Review All Answers</a>
+                <button class="btn btn-outline btn-sm"><i class="fas fa-share-alt"></i> Share Result</button>
+            </div>
+        </div>
+
+        {% if newly_unlocked %}
+        <div class="new-badges-section mt-5">
+            <h3 class="celebrate-title"><i class="fas fa-stars"></i> Achievements Unlocked!</h3>
+            <div class="new-badges-grid">
+                {% for badge in newly_unlocked %}
+                <div class="new-badge-item">
+                    <div class="badge-glow"></div>
+                    <i class="fas fa-medal"></i>
+                    <p>{{ badge.name }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="result-actions">
+
+            {% if certificate %}
+            <a href="{% url 'view_certificate' certificate.certificate_number %}" class="btn btn-gold"><i
+                    class="fas fa-medal"></i> View Certificate</a>
+            {% endif %}
+            <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+            <a href="{% url 'quiz_config' result.subcategory.id %}" class="btn btn-outline">Retake Quiz</a>
+        </div>
+
+
+    </div>
+</div>
+
+<style>
+    .result-container {
+        max-width: 700px;
+        margin: 4rem auto;
+        animation: scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes scaleUp {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .result-card {
+        background: var(--bg-card);
+        padding: 4rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--glass-border);
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .score-circle {
+        width: 180px;
+        margin: 0 auto 2rem;
+    }
+
+    .circular-chart {
+        display: block;
+        margin: 10px auto;
+        max-width: 100%;
+        max-height: 250px;
+    }
+
+    .circle-bg {
+        fill: none;
+        stroke: var(--glass);
+        stroke-width: 2.8;
+    }
+
+    .circle {
+        fill: none;
+        stroke-width: 2.8;
+        stroke-linecap: round;
+        stroke: var(--primary);
+        animation: progress 1s ease-out forwards;
+    }
+
+    @keyframes progress {
+        0% {
+            stroke-dasharray: 0 100;
+        }
+    }
+
+    .percentage {
+        fill: var(--text-main);
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.5rem;
+        font-weight: 700;
+        text-anchor: middle;
+    }
+
+    .result-header h2 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .result-header p span {
+        color: var(--primary);
+        font-weight: 700;
+    }
+
+    .stats-row {
+        display: flex;
+        justify-content: space-around;
+        margin: 3rem 0;
+        padding: 2rem 0;
+        border-top: 1px solid var(--glass-border);
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .stat-label {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .ai-summary-card {
+        background: rgba(var(--primary-h), var(--primary-s), 50%, 0.05);
+        border: 1px solid rgba(var(--primary-h), var(--primary-s), 50%, 0.2);
+        padding: 2rem;
+        border-radius: var(--radius-md);
+        text-align: left;
+        margin-bottom: 3rem;
+    }
+
+    .ai-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+        color: var(--primary);
+    }
+
+    .ai-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .ai-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .result-actions {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-gold {
+        background: linear-gradient(135deg, #f1c40f, #f39c12);
+        color: #000;
+        font-weight: 800;
+        border: none;
+    }
+
+    .btn-gold:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(243, 156, 18, 0.3);
+        color: #000;
+    }
+
+    /* New Badges Animation */
+    .new-badges-section {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 2rem;
+        border: 1px dashed var(--primary);
+    }
+
+    .celebrate-title {
+        color: var(--primary);
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+    }
+
+    .new-badges-grid {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+    }
+
+    .new-badge-item {
+        position: relative;
+        text-align: center;
+    }
+
+    .new-badge-item i {
+        font-size: 3rem;
+        color: #f1c40f;
+        animation: bounce 2s infinite;
+    }
+
+    .badge-glow {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background: radial-gradient(circle, rgba(241, 196, 15, 0.4), transparent);
+        top: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        filter: blur(10px);
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const score = {{ result.score }
+    };
+    if (score >= 75) {
+        const duration = 3 * 1000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#3b82f6', '#10b981', '#f59e0b']
+            });
+            confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#3b82f6', '#10b981', '#f59e0b']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+    }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Achievements | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="achievements-page container py-5 text-white">
+    <div class="achievements-header text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">Your Achievements</h1>
+        <p class="text-muted">Unlock badges by completing quizzes and scoring high!</p>
+
+        <div class="streak-badge mt-4">
+            <div class="streak-icon">
+                <i class="fas fa-fire"></i>
+            </div>
+            <div class="streak-info">
+                <h3>{{ streak.current_streak }} Day Streak</h3>
+                <p>Max Streak: {{ streak.max_streak }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="badges-grid">
+        {% for badge in all_badges %}
+        <div class="badge-card {% if badge.id in user_badges %}unlocked{% else %}locked{% endif %}">
+            <div class="badge-visual">
+                {% if badge.image %}
+                <img src="{{ badge.image.url }}" alt="{{ badge.name }}">
+                {% else %}
+                <div class="badge-icon-fallback">
+                    <i class="fas fa-medal"></i>
+                </div>
+                {% endif %}
+                {% if badge.id not in user_badges %}
+                <div class="lock-overlay">
+                    <i class="fas fa-lock"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div class="badge-content">
+                <h3>{{ badge.name }}</h3>
+                <p>{{ badge.description }}</p>
+                {% if badge.id in user_badges %}
+                <span class="status unlocked-text"><i class="fas fa-check-circle"></i> Unlocked</span>
+                {% else %}
+                <span class="status locked-text">Keep Playing to Unlock</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .achievements-header {
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .streak-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 1.5rem;
+        background: var(--glass);
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 10px 30px rgba(255, 71, 87, 0.2);
+    }
+
+    .streak-icon {
+        font-size: 2.5rem;
+        color: #ff4757;
+        filter: drop-shadow(0 0 10px #ff4757);
+        animation: pulse 1.5s infinite;
+    }
+
+    .streak-info h3 {
+        margin: 0;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    .streak-info p {
+        margin: 0;
+        opacity: 0.6;
+        font-size: 0.9rem;
+    }
+
+    .badges-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .badge-card {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .badge-card.locked {
+        filter: grayscale(1);
+        opacity: 0.7;
+    }
+
+    .badge-card.unlocked {
+        background: linear-gradient(135deg, rgba(var(--primary-h), var(--primary-s), 20%, 0.1), rgba(var(--accent-h), var(--accent-s), 20%, 0.1));
+        border-color: var(--primary);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .badge-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .badge-card.unlocked:hover {
+        box-shadow: 0 20px 50px rgba(var(--primary-h), var(--primary-s), 50%, 0.2);
+    }
+
+    .badge-visual {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .badge-icon-fallback {
+        font-size: 4rem;
+        color: var(--primary);
+    }
+
+    .lock-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .badge-content h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .badge-content p {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .unlocked-text {
+        background: rgba(39, 174, 96, 0.2);
+        color: #27ae60;
+    }
+
+    .locked-text {
+        background: rgba(255, 255, 255, 0.05);
+        color: #888;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}

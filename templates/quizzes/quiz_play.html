@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load quizzes_extras %}
+
+
+{% block title %}Playing: {{ subcategory.name_en }} | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="quiz-play-container text-white">
+    <div class="quiz-header">
+        <div class="category-info">
+            <span class="badge">{{ subcategory.category.name_en }} &raquo; {{ subcategory.name_en }}</span>
+            <h2 id="question-counter">Question 1 of {{ questions.count }}</h2>
+        </div>
+        <div class="header-right">
+            <div class="quiz-timer">
+                <i class="fas fa-clock"></i>
+                <span id="timer">10:00</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: 10%"></div>
+    </div>
+
+    <form id="quiz-form" method="POST" action="{% url 'submit_quiz' %}">
+        {% csrf_token %}
+        <input type="hidden" name="subcategory_id" value="{{ subcategory.id }}">
+        <input type="hidden" name="session_id" value="{{ session.id }}">
+        <input type="hidden" name="duration" id="duration-input" value="0">
+
+        <div class="questions-container">
+            {% for question in questions %}
+            <div class="question-slide {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter }}">
+                <div class="question-text">
+                    <h3>{{ question.text_en }}</h3>
+                    <p class="tamil-text">{{ question.text_ta }}</p>
+                </div>
+
+                <div class="choices-grid" id="choices-{{ question.id }}">
+                    {% for choice in question.choices.all %}
+                    <label class="choice-card"
+                        onclick="handleChoiceClick('{{ choice.id }}', '{{ question.id }}', this)">
+                        <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}">
+                        <span class="choice-text">
+                            <span class="choice-letter">{{ forloop.counter|add:64|chr }}</span>
+                            <span class="en-text">{{ choice.text_en }}</span>
+                            {% if choice.text_ta and choice.text_ta != choice.text_en %}
+                            <span class="ta-text">{{ choice.text_ta }}</span>
+                            {% endif %}
+                        </span>
+                        <div class="check-icon"><i class="fas fa-check"></i></div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+
+        <div class="quiz-controls">
+            <button type="button" id="prev-btn" class="btn btn-outline" disabled><i class="fas fa-chevron-left"></i>
+                Previous</button>
+            <div class="step-dots">
+                {% for question in questions %}
+                <span class="dot {% if forloop.first %}active{% endif %}"></span>
+                {% endfor %}
+            </div>
+            <button type="button" id="next-btn" class="btn btn-primary">Next <i
+                    class="fas fa-chevron-right"></i></button>
+            <button type="submit" id="submit-btn" class="btn btn-primary" style="display: none;">Submit Quiz <i
+                    class="fas fa-paper-plane"></i></button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .quiz-play-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .header-right {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .lives-pill {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .question-slide {
+        display: none;
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    .question-slide.active {
+        display: block;
+    }
+
+    .choice-card.selected-choice {
+        border-color: var(--primary) !important;
+        background: rgba(var(--primary-h), var(--primary-s), 50%, 0.1) !important;
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(var(--primary-h), var(--primary-s), 50%, 0.2);
+    }
+
+
+    @media (max-width: 600px) {
+        .choices-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+</style>
+
+<script>
+    let currentSlide = 0;
+    let wheelAttempted = false;
+
+    let currentPendingChoice = null;
+    let currentPendingQuestionId = null;
+    let currentPendingElement = null;
+
+    function handleChoiceClick(choiceId, questionId, element) {
+        // Clear previous selection in this question
+        const container = document.getElementById(`choices-${questionId}`);
+        container.querySelectorAll('.choice-card').forEach(card => {
+            card.classList.remove('selected-choice');
+        });
+
+        // Mark current as selected
+        element.classList.add('selected-choice');
+
+        // Find and check the corresponding radio input
+        const radio = element.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+    }
+
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const slides = document.querySelectorAll('.question-slide');
+        const dots = document.querySelectorAll('.dot');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const progressFill = document.querySelector('.progress-fill');
+        const counter = document.getElementById('question-counter');
+
+        if (!slides.length) return;
+
+        const totalSlides = slides.length;
+
+        function updateUI() {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+                if (dots[i]) dots[i].classList.toggle('active', i === currentSlide);
+            });
+
+            if (prevBtn) prevBtn.disabled = currentSlide === 0;
+
+            if (currentSlide === totalSlides - 1) {
+                if (nextBtn) nextBtn.style.display = 'none';
+                if (submitBtn) submitBtn.style.display = 'flex';
+            } else {
+                if (nextBtn) nextBtn.style.display = 'flex';
+                if (submitBtn) submitBtn.style.display = 'none';
+            }
+
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            if (progressFill) progressFill.style.width = `${progress}%`;
+            if (counter) counter.innerText = `Question ${currentSlide + 1} of ${totalSlides}`;
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateUI();
+                }
+            });
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateUI();
+                }
+            });
+        }
+
+
+        // Timer Logic
+        let seconds = 600;
+        const timerEl = document.getElementById('timer');
+        const durationInput = document.getElementById('duration-input');
+
+        const timerInterval = setInterval(() => {
+            seconds--;
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            if (timerEl) timerEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            if (durationInput) durationInput.value = 600 - seconds;
+
+            if (seconds <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('quiz-form').submit();
+            }
+        }, 1000);
+
+        // Initial UI Sync
+        updateUI();
+    });
+
+</script>
+
+{% endblock %}

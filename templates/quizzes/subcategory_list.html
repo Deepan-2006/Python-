@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name_en }} Subcategories | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="breadcrumb mb-4">
+        <a href="{% url 'category_list' %}">Categories</a> <i class="fas fa-chevron-right mx-2"></i> <span>{{
+            category.name_en }}</span>
+    </div>
+
+    <div class="section-header mb-5">
+        <h1>{{ category.name_en }} <span>Topics</span></h1>
+        <p class="text-muted">Select a specific topic to start your AI-generated quiz.</p>
+    </div>
+
+    <div class="card-grid">
+        {% for sub in subcategories %}
+        <div class="card subcategory-card" data-aos="zoom-in" data-aos-delay="{{ forloop.counter|add:50 }}">
+            <div class="sub-header">
+                <h3>{{ sub.name_en }}</h3>
+                <span class="lang-text">{{ sub.name_ta }}</span>
+            </div>
+            <p>{{ sub.description|default:"Deep dive into this topic with dynamic AI questions." }}</p>
+            <div class="action-footer mt-4">
+                <a href="{% url 'quiz_config' sub.id %}" class="btn btn-primary w-100">Configure Quiz</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card empty-card text-center">
+            <p>No topics available for this category yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .subcategory-card {
+        padding: 2rem;
+        border-left: 4px solid var(--primary);
+    }
+
+    .sub-header {
+        margin-bottom: 1rem;
+    }
+
+    .lang-text {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        font-family: 'BabelStone Tamil Unicode', sans-serif;
+    }
+
+    .breadcrumb a {
+        color: var(--primary);
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
