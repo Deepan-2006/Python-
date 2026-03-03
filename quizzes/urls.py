@@ -12,6 +12,7 @@ urlpatterns = [
     path('session/<int:session_id>/resume/', views.resume_quiz, name='resume_quiz'),
 
     path('certificate/<str:certificate_number>/', views.view_certificate, name='view_certificate'),
+    path('certificate/<str:certificate_number>/download/', views.download_certificate, name='download_certificate'),
     path('quiz/check-answer/', views.check_answer, name='check_answer'),
 ]
 

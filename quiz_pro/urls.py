@@ -10,6 +10,9 @@ urlpatterns = [
     path('', include('core.urls')),
     path('users/', include('users.urls')),
     path('quizzes/', include('quizzes.urls')),
+    path('gamification/', include('gamification.urls')),
+    path('accounts/', include('allauth.urls')),
+
     # Convenience redirects
     path('login/', lambda r: redirect('/users/login/')),
     path('register/', lambda r: redirect('/users/register/')),

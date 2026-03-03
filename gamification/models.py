@@ -26,3 +26,35 @@ class Streak(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.current_streak} days"
+
+class DailySpinTracker(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='spin_tracks')
+    date = models.DateField(auto_now_add=True)
+    spins_used = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('user', 'date')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date} - {self.spins_used} spins"
+
+class UserReward(models.Model):
+    REWARD_TYPES = (
+        ('bonus_marks_5', '+5 Bonus Marks'),
+        ('bonus_marks_10', '+10 Bonus Marks'),
+        ('free_reattempt', '1 Free Reattempt Token'),
+        ('premium_unlock', 'Unlock Premium Topic (1 Day)'),
+        ('points_50', '50 Reward Points'),
+        ('points_100', '100 Reward Points'),
+        ('double_points', 'Double Points in Next Quiz'),
+        ('surprise_unlock', 'Surprise Quiz Unlock'),
+        ('better_luck', 'Better Luck Next Time'),
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rewards')
+    reward_type = models.CharField(max_length=50, choices=REWARD_TYPES)
+    is_used = models.BooleanField(default=False)
+    awarded_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_reward_type_display()}"

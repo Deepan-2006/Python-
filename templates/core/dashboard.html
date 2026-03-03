@@ -72,6 +72,21 @@
             {% endif %}
         </div>
 
+        <!-- Daily Spin Card -->
+        <div class="dash-card daily-spin-promo">
+            <div class="card-header">
+                <i class="fas fa-dharmachakra"></i>
+                <h3>Daily Rewards</h3>
+            </div>
+            <p class="insight-text">Don't forget your daily spins! Win bonus marks and XP points.</p>
+            <div class="spin-promo-content">
+                <div class="spin-icon-wrapper">
+                    <i class="fas fa-gift pulse-animation"></i>
+                </div>
+                <a href="{% url 'daily_spin' %}" class="btn btn-primary btn-block">Spin & Win</a>
+            </div>
+        </div>
+
         <!-- Ongoing Quizzes -->
         <div class="dash-card">
             <div class="card-header">
@@ -379,6 +394,36 @@
         font-size: 0.75rem;
     }
 
+
+
+    .pulse-animation {
+        animation: pulse 2s infinite;
+        font-size: 2.5rem;
+        color: var(--primary);
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .spin-promo-content {
+        text-align: center;
+        padding: 1rem 0;
+    }
+
+    .spin-icon-wrapper {
+        margin-bottom: 1.5rem;
+    }
 
     @media (max-width: 900px) {
         .dashboard-grid {

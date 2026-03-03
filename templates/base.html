@@ -25,14 +25,19 @@
 </head>
 
 <body>
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
     <div class="app-container">
+
         <!-- Navigation -->
         <nav class="navbar">
             <div class="nav-content">
-                <a href="{% url 'home' %}" class="logo">
+                <a href="{% url 'home' %}" class="logo magnetic">
                     <span class="logo-icon"><i class="fas fa-brain"></i></span>
                     <span class="logo-text">Quiz<span>Pro</span></span>
                 </a>
+
 
                 <div class="nav-links">
                     <a href="{% url 'home' %}"
@@ -62,9 +67,10 @@
                     </div>
 
                     {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-outline">Login</a>
-                    <a href="{% url 'register' %}" class="btn btn-primary">Sign Up</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline magnetic">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary magnetic">Sign Up</a>
                     {% endif %}
+
                 </div>
 
                 <button class="mobile-menu-toggle">

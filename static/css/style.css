@@ -373,4 +373,60 @@ a {
     .content-wrapper {
         padding: 1rem;
     }
+
+    .cursor,
+    .cursor-follower {
+        display: none;
+    }
+}
+
+/* Custom Cursor & Premium Effects */
+.cursor {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    transition: transform 0.1s ease;
+}
+
+.cursor-follower {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--primary);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67), background 0.3s ease;
+}
+
+.cursor-hover .cursor-follower {
+    transform: scale(1.5);
+    background: rgba(var(--primary-h), var(--primary-s), 50%, 0.1);
+}
+
+.magnetic {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Antigravity / Smooth Hover Transitions */
+.btn,
+.card,
+.nav-link,
+.logo {
+    position: relative;
+    transition: var(--transition);
+}
+
+body {
+    cursor: none;
+}
+
+a,
+button {
+    cursor: none !important;
 }

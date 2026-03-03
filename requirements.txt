@@ -2,3 +2,8 @@ django>=6.0.2
 pillow
 requests
 openai
+reportlab
+python-dotenv
+django-allauth
+PyJWT
+cryptography

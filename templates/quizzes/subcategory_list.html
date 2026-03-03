@@ -24,7 +24,8 @@
             </div>
             <p>{{ sub.description|default:"Deep dive into this topic with dynamic AI questions." }}</p>
             <div class="action-footer mt-4">
-                <a href="{% url 'quiz_config' sub.id %}" class="btn btn-primary w-100">Configure Quiz</a>
+                <a href="{% url 'quiz_config' sub.id %}" class="btn btn-primary w-100 magnetic">Configure Quiz</a>
+
             </div>
         </div>
         {% empty %}
