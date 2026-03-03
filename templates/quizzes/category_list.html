@@ -10,30 +10,125 @@
         <p class="text-muted">Choose a category to find specialized topics prepared for you.</p>
     </div>
 
-    <div class="card-grid">
-        {% for category in categories %}
-        <div class="card category-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
-            <div class="category-img">
-                {% if category.icon %}
-                <img src="{{ category.icon.url }}" alt="{{ category.name_en }}">
-                {% else %}
-                <div class="placeholder-icon"><i class="fas fa-book"></i></div>
-                {% endif %}
+    <div class="category-tabs text-center mb-5">
+        <button class="btn btn-outline-primary active magnetic" id="tab-technical"
+            onclick="switchTab('technical')">Technical</button>
+        <button class="btn btn-outline-primary magnetic" id="tab-non-technical"
+            onclick="switchTab('non-technical')">Non-Technical</button>
+        <button class="btn btn-outline-primary magnetic" id="tab-entertainment"
+            onclick="switchTab('entertainment')">Entertainment</button>
+    </div>
+
+
+    <!-- Technical Categories -->
+    <div id="content-technical" class="category-section">
+        <h2 class="mb-4 text-center">Technical Domain</h2>
+        <div class="card-grid">
+            {% for category in technical_categories %}
+            <div class="card category-card" data-aos="fade-up">
+                <div class="category-img">
+                    {% if category.icon %}
+                    <img src="{{ category.icon.url }}" alt="{{ category.name_en }}">
+                    {% else %}
+                    <div class="placeholder-icon"><i class="fas fa-microchip"></i></div>
+                    {% endif %}
+                </div>
+                <h3>{{ category.name_en }}</h3>
+                <p>{{ category.description|truncatewords:15 }}</p>
+                <div class="category-meta mb-4">
+                    <span class="badge"><i class="fas fa-layer-group"></i> {{ category.subcategories.count }}
+                        Topics</span>
+                </div>
+                <a href="{% url 'subcategory_list' category.id %}" class="btn btn-primary w-100 magnetic">Start Quiz</a>
+
             </div>
-            <h3>{{ category.name_en }}</h3>
-            <p>{{ category.description|truncatewords:15 }}</p>
-            <div class="category-meta mb-4">
-                <span class="badge"><i class="fas fa-layer-group"></i> {{ category.subcategories.count }} Topics</span>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p>No technical categories found.</p>
             </div>
-            <a href="{% url 'subcategory_list' category.id %}" class="btn btn-primary w-100">Browse Topics</a>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="card empty-card text-center">
-            <p>No categories available yet. Please check back later.</p>
+    </div>
+
+    <!-- Non-Technical Categories -->
+    <div id="content-non-technical" class="category-section" style="display: none;">
+        <h2 class="mb-4 text-center">Non-Technical Domain</h2>
+        <div class="card-grid">
+            {% for category in non_technical_categories %}
+            <div class="card category-card" data-aos="fade-up">
+                <div class="category-img">
+                    {% if category.icon %}
+                    <img src="{{ category.icon.url }}" alt="{{ category.name_en }}">
+                    {% else %}
+                    <div class="placeholder-icon"><i class="fas fa-globe"></i></div>
+                    {% endif %}
+                </div>
+                <h3>{{ category.name_en }}</h3>
+                <p>{{ category.description|truncatewords:15 }}</p>
+                <div class="category-meta mb-4">
+                    <span class="badge"><i class="fas fa-layer-group"></i> {{ category.subcategories.count }}
+                        Topics</span>
+                </div>
+                <a href="{% url 'subcategory_list' category.id %}" class="btn btn-primary w-100 magnetic">Start Quiz</a>
+
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p>No non-technical categories found.</p>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+    </div>
+
+
+
+    <!-- Entertainment Categories -->
+    <div id="content-entertainment" class="category-section" style="display: none;">
+        <h2 class="mb-4 text-center">Entertainment Domain</h2>
+        <div class="card-grid">
+            {% for category in entertainment_categories %}
+            <div class="card category-card" data-aos="fade-up">
+                <div class="category-img">
+                    {% if category.icon %}
+                    <img src="{{ category.icon.url }}" alt="{{ category.name_en }}">
+                    {% else %}
+                    <div class="placeholder-icon"><i class="fas fa-film"></i></div>
+                    {% endif %}
+                </div>
+                <h3>{{ category.name_en }}</h3>
+                <p>{{ category.description|truncatewords:15 }}</p>
+                <div class="category-meta mb-4">
+                    <span class="badge"><i class="fas fa-layer-group"></i> {{ category.subcategories.count }}
+                        Topics</span>
+                </div>
+                <a href="{% url 'subcategory_list' category.id %}" class="btn btn-primary w-100 magnetic">Start Quiz</a>
+
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p>No entertainment categories found.</p>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
+
+<script>
+    function switchTab(type) {
+        // Hide all sections
+        document.querySelectorAll('.category-section').forEach(el => el.style.display = 'none');
+        // Show target section
+        document.getElementById('content-' + type).style.display = 'block';
+
+        // Update buttons
+        document.querySelectorAll('.category-tabs button').forEach(btn => btn.classList.remove('active', 'btn-primary'));
+        document.querySelectorAll('.category-tabs button').forEach(btn => btn.classList.add('btn-outline-primary'));
+
+        const activeBtn = document.getElementById('tab-' + type);
+        activeBtn.classList.remove('btn-outline-primary');
+        activeBtn.classList.add('active', 'btn-primary');
+    }
+</script>
 
 <style>
     .category-card {

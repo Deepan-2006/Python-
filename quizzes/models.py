@@ -2,14 +2,21 @@ from django.db import models
 from users.models import User
 
 class Category(models.Model):
+    CATEGORY_TYPES = (
+        ('technical', 'Technical'),
+        ('non-technical', 'Non-Technical'),
+        ('entertainment', 'Entertainment'),
+    )
+
     name_en = models.CharField(max_length=100)
     name_ta = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    category_type = models.CharField(max_length=20, choices=CATEGORY_TYPES, default='technical')
     icon = models.ImageField(upload_to='categories/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name_en
+        return f"{self.name_en} ({self.get_category_type_display()})"
 
     class Meta:
         verbose_name_plural = "Categories"
@@ -19,6 +26,7 @@ class SubCategory(models.Model):
     name_en = models.CharField(max_length=100)
     name_ta = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    is_premium = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -25,20 +25,35 @@ def login_view(request):
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
+            identifier = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+            
+            # Try to authenticate with the identifier as username
+            user = authenticate(username=identifier, password=password)
+            
+            # If failed, try to find a user with this email and authenticate with their username
+            if user is None and '@' in identifier:
+                try:
+                    from django.contrib.auth import get_user_model
+                    User = get_user_model()
+                    user_obj = User.objects.get(email=identifier)
+                    user = authenticate(username=user_obj.username, password=password)
+                except (User.DoesNotExist, User.MultipleObjectsReturned):
+                    pass
+
+
             if user is not None:
-                if user.is_locked:
+                if getattr(user, 'is_locked', False):
                     messages.error(request, 'Your account is locked due to multiple failed attempts.')
                 else:
                     login(request, user)
                     return redirect('dashboard')
             else:
-                messages.error(request, 'Invalid username or password.')
+                messages.error(request, 'Invalid email/username or password.')
     else:
         form = UserLoginForm()
     return render(request, 'users/login.html', {'form': form})
+
 
 def logout_view(request):
     logout(request)

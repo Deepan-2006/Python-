@@ -9,6 +9,14 @@
         <h2 class="text-center mb-4">Quiz <span>Configuration</span></h2>
         <p class="text-center text-muted mb-5">Topic: <strong>{{ subcategory.name_en }}</strong></p>
 
+        {% if premium_locked %}
+        <div class="premium-notice mb-4">
+            <i class="fas fa-lock"></i>
+            <h3>Premium Topic</h3>
+            <p>This topic is locked. Use a <strong>Premium Unlock</strong> reward from the Daily Spin to access it!</p>
+            <a href="{% url 'daily_spin' %}" class="btn btn-secondary w-100">Go to Daily Spin</a>
+        </div>
+        {% else %}
         <form action="{% url 'start_quiz' subcategory.id %}" method="get">
             <div class="form-group mb-5">
                 <label class="d-block mb-3">Choose Difficulty</label>
@@ -43,10 +51,12 @@
                 <div class="info-item"><i class="fas fa-trophy"></i> <span>XP Rewards</span></div>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
+            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 magnetic">
                 <i class="fas fa-play mr-2"></i> Start Dynamic Quiz
             </button>
+
         </form>
+        {% endif %}
     </div>
 </div>
 
@@ -103,6 +113,25 @@
     .info-item i {
         color: var(--primary);
         font-size: 1.2rem;
+    }
+
+    .premium-notice {
+        text-align: center;
+        background: rgba(255, 62, 62, 0.05);
+        border: 1px dashed #ff3e3e;
+        padding: 2rem;
+        border-radius: 20px;
+    }
+
+    .premium-notice i {
+        font-size: 3rem;
+        color: #ff3e3e;
+        margin-bottom: 1rem;
+    }
+
+    .premium-notice h3 {
+        color: #ff3e3e;
+        margin-bottom: 0.5rem;
     }
 </style>
 {% endblock %}

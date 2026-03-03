@@ -1,0 +1,158 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                     QUIZ MANAGEMENT SYSTEM - ARCHITECTURE                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                            CATEGORY SELECTION                                 │
+│                                                                               │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐           │
+│  │ TECHNICAL  │  │NON-TECH    │  │ ACADEMIC   │  │ENTERTAINMENT│           │
+│  │    💻      │  │    🌍      │  │    🎓      │  │    🎬       │           │
+│  └────────────┘  └────────────┘  └────────────┘  └────────────┘           │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                     ↓
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                             TOPIC SELECTION                                   │
+│                                                                               │
+│  TECHNICAL (5 topics):                                                        │
+│  • Programming         • Data Structures    • DBMS                           │
+│  • Networking          • Cyber Security                                       │
+│                                                                               │
+│  NON-TECHNICAL (4 topics):                                                    │
+│  • Aptitude           • Reasoning           • General Knowledge              │
+│  • Current Affairs                                                            │
+│                                                                               │
+│  ACADEMIC (3 topics):                                                         │
+│  • Physics            • Chemistry           • Mathematics                     │
+│                                                                               │
+│  ENTERTAINMENT (3 topics):                                                    │
+│  • Sports             • Movies              • Music                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                     ↓
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                          QUIZ CONFIGURATION                                   │
+│                                                                               │
+│  Selected Topic: [e.g., Programming]                                         │
+│  Difficulty: [ Easy ] [ Medium ] [ Hard ]                                    │
+│  Questions: 10                                                                 │
+│                                                                               │
+│                           [ Start Quiz ]                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                     ↓
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              QUIZ PLAY                                        │
+│                                                                               │
+│  Question 1/10: What does HTML stand for?                                    │
+│  ○ Hyper Text Markup Language                                                │
+│  ○ High Tech Multi Language                                                  │
+│  ○ Home Tool Markup Language                                                 │
+│  ○ Hyperlinks and Text Markup Language                                       │
+│                                                                               │
+│  ⚠️ IMPORTANT: Questions are now TOPIC-SPECIFIC!                              │
+│     Programming → Programming questions                                       │
+│     Physics → Physics questions                                               │
+│     Sports → Sports questions                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                     ↓
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                            RESULTS PAGE                                       │
+│                                                                               │
+│  ┌────────────────────────────────────────────────────────────────┐         │
+│  │                     QUIZ COMPLETED! 🎉                          │         │
+│  │                                                                 │         │
+│  │                      Score: 85%                                 │         │
+│  │                   Correct: 17/20                                │         │
+│  │                   Points: +85 XP                                │         │
+│  └────────────────────────────────────────────────────────────────┘         │
+│                                                                               │
+│  ┌────────────────────────────────────────────────────────────────┐         │
+│  │              🏆 YOUR CERTIFICATE IS READY! 🏆                   │         │
+│  │                                                                 │         │
+│  │  ╔══════════════════════════════════════════════════════════╗ │         │
+│  │  ║                                                          ║ │         │
+│  │  ║         🎓 QUIZ PRO                                     ║ │         │
+│  │  ║                                                          ║ │         │
+│  │  ║        CERTIFICATE of ACHIEVEMENT                       ║ │         │
+│  │  ║                                                          ║ │         │
+│  │  ║    This certificate is proudly presented to             ║ │         │
+│  │  ║                                                          ║ │         │
+│  │  ║              YOUR_USERNAME                               ║ │         │
+│  │  ║              ─────────────                               ║ │         │
+│  │  ║                                                          ║ │         │
+│  │  ║    For successfully completing the                      ║ │         │
+│  │  ║           Programming Quiz                               ║ │         │
+│  │  ║      with an outstanding score of 85%                    ║ │         │
+│  │  ║                                                          ║ │         │
+│  │  ║    Difficulty: Medium                                    ║ │         │
+│  │  ║                                                          ║ │         │
+│  │  ║   AI Engine          🏅          Feb 14, 2026           ║ │         │
+│  │  ║                                                          ║ │         │
+│  │  ║                     Certificate ID: QP2026-XXXXX        ║ │         │
+│  │  ╚══════════════════════════════════════════════════════════╝ │         │
+│  │                                                                 │         │
+│  │         [ 🔍 View Full Screen ]  [ 📥 Download PDF ]           │         │
+│  │                                                                 │         │
+│  │  ✨ NEW FEATURE: Certificate now previews instantly!            │         │
+│  └────────────────────────────────────────────────────────────────┘         │
+│                                                                               │
+│                [ 🏠 Back to Home ]  [ 🔄 Retake Quiz ]                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                            KEY IMPROVEMENTS                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+✅ FIX #1: CERTIFICATE PREVIEW
+   ┌─────────────────────────────────────────────────────────────┐
+   │ BEFORE                    │  AFTER                          │
+   ├───────────────────────────┼─────────────────────────────────┤
+   │ • Certificate only        │  • Certificate shows instantly  │
+   │   downloadable            │    in preview mode              │
+   │ • Not visible after quiz  │  • Beautiful inline display     │
+   │ • No preview option       │  • Full screen option           │
+   │                           │  • Download PDF option          │
+   └───────────────────────────┴─────────────────────────────────┘
+
+✅ FIX #2: TOPIC-SPECIFIC QUESTIONS
+   ┌─────────────────────────────────────────────────────────────┐
+   │ BEFORE                    │  AFTER                          │
+   ├───────────────────────────┼─────────────────────────────────┤
+   │ • All quizzes showed      │  • 15 unique topics             │
+   │   same questions          │  • 75 topic-specific questions  │
+   │ • 2 categories only       │  • 4 categories available       │
+   │ • No variation            │  • Programming gets programming │
+   │                           │    questions                    │
+   │                           │  • Physics gets physics         │
+   │                           │    questions                    │
+   │                           │  • Sports gets sports questions │
+   └───────────────────────────┴─────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          DATABASE STRUCTURE                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Category (4 total)
+├── Technical
+│   ├── Programming (5 questions)
+│   ├── Data Structures (5 questions)
+│   ├── DBMS (5 questions)
+│   ├── Networking (5 questions)
+│   └── Cyber Security (5 questions)
+│
+├── Non-Technical
+│   ├── Aptitude (5 questions)
+│   ├── Reasoning (5 questions)
+│   ├── General Knowledge (5 questions)
+│   └── Current Affairs (5 questions)
+│
+├── Academic
+│   ├── Physics (5 questions)
+│   ├── Chemistry (5 questions)
+│   └── Mathematics (5 questions)
+│
+└── Entertainment
+    ├── Sports (5 questions)
+    ├── Movies (5 questions)
+    └── Music (5 questions)
+
+TOTAL: 4 Categories | 15 Topics | 75 Questions

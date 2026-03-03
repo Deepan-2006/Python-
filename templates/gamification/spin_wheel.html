@@ -1,0 +1,524 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Daily Spin Wheel | Quiz Pro{% endblock %}
+
+{% block content %}
+<div class="spin-container">
+    <div class="spin-header">
+        <h1>Daily <span>Spin Wheel</span></h1>
+        <p>Spin the wheel to win exciting rewards for your next quiz!</p>
+    </div>
+
+    <div class="spin-main">
+        <div class="wheel-section">
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer"></div>
+                <div class="wheel" id="wheel">
+                    <!-- Wheel segments will be rendered here via CSS/JS -->
+                    <div class="segment" style="--i:0; --clr:#ff3e3e;"><span>+5 Marks</span></div>
+                    <div class="segment" style="--i:1; --clr:#3498db;"><span>50 Pts</span></div>
+                    <div class="segment" style="--i:2; --clr:#1abc9c;"><span>Reattempt</span></div>
+                    <div class="segment" style="--i:3; --clr:#f1c40f;"><span>Better Luck</span></div>
+                    <div class="segment" style="--i:4; --clr:#9b59b6;"><span>+10 Marks</span></div>
+                    <div class="segment" style="--i:5; --clr:#e67e22;"><span>100 Pts</span></div>
+                    <div class="segment" style="--i:6; --clr:#34495e;"><span>Premium</span></div>
+                    <div class="segment" style="--i:7; --clr:#27ae60;"><span>Double Pts</span></div>
+                </div>
+                <button class="spin-btn" id="spinBtn" {% if spins_left <= 0 %}disabled{% endif %}>
+                    SPIN
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <h3>Spins Remaining</h3>
+                <div class="spin-progress-bar">
+                    <div class="progress-fill" style="width: {{ spins_left|add:spins_left|add:spins_left }}0%;"></div>
+                </div>
+                <p class="spin-count">{{ spins_left }} / {{ max_spins }}</p>
+                {% if current_streak >= 5 %}
+                <span class="badge streak-bonus"><i class="fas fa-fire"></i> Streak Bonus Active (+1 Spin)</span>
+                {% else %}
+                <p class="next-bonus">Get 5 day streak for extra spin! (Current: {{ current_streak }})</p>
+                {% endif %}
+            </div>
+
+            <div class="history-card">
+                <h3>Recent Rewards</h3>
+                <ul class="reward-list">
+                    {% for reward in recent_rewards %}
+                    <li>
+                        <i class="fas fa-gift"></i>
+                        <span>{{ reward.get_reward_type_display }}</span>
+                        <small>{{ reward.awarded_at|timesince }} ago</small>
+                    </li>
+                    {% empty %}
+                    <p class="no-history">No rewards yet. Spin now!</p>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reward Modal -->
+<div class="reward-modal" id="rewardModal">
+    <div class="modal-content">
+        <div class="confetti-container" id="confetti"></div>
+        <div class="reward-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <h2 id="rewardTitle">Congratulations!</h2>
+        <p id="rewardMessage">You won something awesome!</p>
+        <button class="btn btn-primary" onclick="closeModal()">Awesome!</button>
+    </div>
+</div>
+
+<style>
+    .spin-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .spin-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .spin-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .spin-header span {
+        color: var(--primary);
+    }
+
+    .spin-main {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    .wheel-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: var(--bg-card);
+        padding: 3rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .wheel-wrapper {
+        position: relative;
+        width: 400px;
+        height: 400px;
+    }
+
+    .wheel-pointer {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background: var(--primary);
+        clip-path: polygon(50% 100%, 0 0, 100% 0);
+        z-index: 10;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .wheel {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 8px solid #333;
+        position: relative;
+        overflow: hidden;
+        transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .segment {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        background: var(--clr);
+        transform-origin: bottom right;
+        transform: rotate(calc(45deg * var(--i)));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        clip-path: polygon(0 0, 100% 0, 100% 100%);
+    }
+
+    .segment span {
+        position: absolute;
+        transform: rotate(22deg) translateY(-80px);
+        font-weight: 700;
+        color: #fff;
+        font-size: 0.9rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        white-space: nowrap;
+    }
+
+    .spin-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid #333;
+        font-weight: 800;
+        cursor: pointer;
+        z-index: 5;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s;
+    }
+
+    .spin-btn:hover:not(:disabled) {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .spin-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    /* Stats Section */
+    .stat-card,
+    .history-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--glass-border);
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card h3,
+    .history-card h3 {
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .spin-progress-bar {
+        height: 12px;
+        background: var(--glass);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), #00d2ff);
+        transition: width 0.5s ease;
+    }
+
+    .spin-count {
+        text-align: right;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .streak-bonus {
+        display: block;
+        margin-top: 1rem;
+        padding: 0.5rem;
+        background: rgba(255, 62, 62, 0.1);
+        color: #ff3e3e;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        text-align: center;
+    }
+
+    .next-bonus {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+
+    .reward-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .reward-list li {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .reward-list li:last-child {
+        border-bottom: none;
+    }
+
+    .reward-list i {
+        color: var(--primary);
+    }
+
+    .reward-list small {
+        margin-left: auto;
+        color: var(--text-muted);
+    }
+
+    /* Modal */
+    .reward-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: var(--bg-card);
+        padding: 3rem;
+        border-radius: var(--radius-lg);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        position: relative;
+        animation: popIn 0.5s cubic-bezier(0.26, 0.53, 0.74, 1.48);
+    }
+
+    .reward-icon {
+        font-size: 4rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+    }
+
+    @keyframes popIn {
+        from {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .spin-main {
+            grid-template-columns: 1fr;
+        }
+
+        .wheel-wrapper {
+            width: 300px;
+            height: 300px;
+        }
+
+        .segment span {
+            transform: rotate(22deg) translateY(-60px);
+            font-size: 0.7rem;
+        }
+    }
+</style>
+
+<script>
+    const wheel = document.getElementById('wheel');
+    const spinBtn = document.getElementById('spinBtn');
+    const rewardModal = document.getElementById('rewardModal');
+    const rewardTitle = document.getElementById('rewardTitle');
+    const rewardMessage = document.getElementById('rewardMessage');
+
+    // --- Sound Effects Logic ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTick() {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playWinSound() {
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.1);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.5);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime + i * 0.1);
+            osc.stop(audioCtx.currentTime + i * 0.1 + 0.5);
+        });
+    }
+
+    function playLoseSound() {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.5);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+    }
+    // --- End Sound Effects Logic ---
+
+    // Mapping of reward_type to segment index (0 to 7)
+    const rewardMap = {
+        'bonus_marks_5': 0,
+        'points_50': 1,
+        'free_reattempt': 2,
+        'better_luck': 3,
+        'bonus_marks_10': 4,
+        'points_100': 5,
+        'premium_unlock': 6,
+        'double_points': 7
+    };
+
+    let isSpinning = false;
+
+    spinBtn.addEventListener('click', async () => {
+        if (isSpinning) return;
+
+        // Resume AudioContext on user interaction (required by browsers)
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        isSpinning = true;
+        spinBtn.disabled = true;
+
+        try {
+            const response = await fetch("{% url 'spin_api' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const targetIndex = rewardMap[data.reward_type] || 3;
+
+                const extraRotations = 5 + Math.floor(Math.random() * 5);
+                const targetRotation = (extraRotations * 360) - (targetIndex * 45) - 22.5;
+
+                wheel.style.transform = `rotate(${targetRotation}deg)`;
+
+                // Play ticking sound during spin
+                let lastTickAngle = 0;
+                const startTime = performance.now();
+                const duration = 5000;
+
+                function checkTick(timestamp) {
+                    if (!isSpinning) return;
+                    const elapsed = timestamp - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    // Cubic-bezier approximation for ticking frequency
+                    // transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
+                    // We can just calculate the current rotation and tick every 45 degrees
+                    const currentRotation = targetRotation * (1 - Math.pow(1 - progress, 3)); // Approximate ease-out
+
+                    if (Math.abs(currentRotation - lastTickAngle) >= 45) {
+                        playTick();
+                        lastTickAngle = currentRotation;
+                    }
+
+                    if (progress < 1) {
+                        requestAnimationFrame(checkTick);
+                    }
+                }
+                requestAnimationFrame(checkTick);
+
+                setTimeout(() => {
+                    showReward(data);
+                    isSpinning = false;
+                }, 5500);
+            } else {
+                alert(data.message);
+                isSpinning = false;
+            }
+        } catch (error) {
+            console.error("Spin error:", error);
+            alert("Something went wrong. Please try again.");
+            isSpinning = false;
+            spinBtn.disabled = false;
+        }
+    });
+
+    function showReward(data) {
+        rewardTitle.innerText = data.reward_type === 'better_luck' ? "Oh No!" : "Congratulations!";
+        rewardMessage.innerText = `You won: ${data.reward_display}`;
+        rewardModal.style.display = 'flex';
+
+        if (data.reward_type !== 'better_luck') {
+            playWinSound();
+            createConfetti();
+        } else {
+            playLoseSound();
+        }
+    }
+
+    function closeModal() {
+        rewardModal.style.display = 'none';
+        window.location.reload(); // Reload to update stats and history
+    }
+
+    function createConfetti() {
+        const container = document.getElementById('confetti');
+        container.innerHTML = '';
+        for (let i = 0; i < 50; i++) {
+            const c = document.createElement('div');
+            c.style.position = 'absolute';
+            c.style.width = '10px';
+            c.style.height = '10px';
+            c.style.backgroundColor = ['#ff3e3e', '#3498db', '#1abc9c', '#f1c40f'][Math.floor(Math.random() * 4)];
+            c.style.left = Math.random() * 100 + '%';
+            c.style.top = '-10px';
+            c.style.borderRadius = '50%';
+            c.style.transform = `rotate(${Math.random() * 360}deg)`;
+            container.appendChild(c);
+
+            const animation = c.animate([
+                { top: '-10px', opacity: 1 },
+                { top: '100%', opacity: 0 }
+            ], {
+                duration: 1000 + Math.random() * 2000,
+                easing: 'cubic-bezier(0.1, 0.8, 0.8, 0.1)'
+            });
+
+            animation.onfinish = () => c.remove();
+        }
+    }
+</script>
+{% endblock %}
